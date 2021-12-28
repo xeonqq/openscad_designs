@@ -32,12 +32,14 @@ difference(){
     
 pi3_top();
 
-scale([1.0115384615384615,1.011111111111111,1])   
+x_buffer=0.4;
+y_buffer=0.5;
+
+scale([(26+x_buffer)/26,(27+y_buffer)/27,1])   
 translate([13,13,-17.2])
 rotate([0,0,180])
 
-base_with_fit(3.);
-    
+camera_base_with_fit(3, false, 0.6, 0.8,trap_a=0.68, trap_b=1.12, horizontal_snap_length=4.15,cylinder_snap_length=3.2);    
     
     //ribbon hole
     translate([-9,32,-20])

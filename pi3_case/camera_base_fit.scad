@@ -83,98 +83,65 @@ module base_projection(){
     }
 }
 
-module camera_base(pi_case_thickness)
+module camera_base(pi_case_thickness, with_camera_back_mount=true)
 {
     union(){
-translate([0,-(28-27/2),0])
-rotate([-90,0,0])
-translate([-6.3,-14,1.2])
-camera_back();
+        if (with_camera_back_mount)
+        {
+            translate([0,-(28-27/2),0])
+                rotate([-90,0,0])
+                translate([-6.3,-14,1.2])
+                camera_back();
+        }
 
-translate([0,0,-26])
-linear_extrude(pi_case_thickness)
-base_projection();
-}
+        translate([0,0,-26])
+            linear_extrude(pi_case_thickness)
+            base_projection();
     }
+}
 
-horizontal_snap_length=4;
-    
-    
 
-module snap(snap_length)
+
+
+module snap(snap_length, trap_h, trap_a, trap_b)
 {
-trap_a=0.58;
-    trap_b=1.02;
-    trap_h=0.7;
     rotate([0,180,0])
 
-      rotate([180,0,180])
-rotate([0,90,0])
-linear_extrude(snap_length)
- 
-polygon([[0,0],[trap_b,0],[trap_a,trap_h],[0,trap_h]]);  
+        rotate([180,0,180])
+        rotate([0,90,0])
+        linear_extrude(snap_length)
+
+        polygon([[0,0],[trap_b,0],[trap_a,trap_h],[0,trap_h]]);  
 }
 
-module camera_base_with_fit(pi_case_thickness){
-    horizontal_snap_length_2=3;
+module camera_base_with_fit(pi_case_thickness, with_camera_back_mount=true, cylinder_radius=0.5, snap_height=0.7, trap_a=0.58,trap_b=1.02,horizontal_snap_length=4, cylinder_snap_length=3){
 
- union(){    
-   
-
-translate([0,0,26])
-camera_base(pi_case_thickness);
-    
-translate([26/4-horizontal_snap_length/2,27/2,pi_case_thickness])
-snap(horizontal_snap_length);
-
-translate([26*0.75-horizontal_snap_length/2,27/2,pi_case_thickness])
-snap(horizontal_snap_length);
-//roundedcube([26,26,28], false, 2.7, "ymin");
-     radius=0.5;
-translate([26/4*3-horizontal_snap_length_2/2,-27/2,pi_case_thickness-radius-1.1])
-rotate([0,90,0])
-cylinder(horizontal_snap_length_2,r=radius);
-
-translate([26/4-horizontal_snap_length_2/2,-27/2,pi_case_thickness-radius-1.1])
-rotate([0,90,0])
-cylinder(horizontal_snap_length_2,r=radius);
-//translate([26/2-horizontal_snap_length_2/2,-27/2,pi_case_thickness-1.])
-//rotate([0,180,180])
-//snap(horizontal_snap_length_2);
-     
-     
-
- }
+    union(){    
 
 
+        translate([0,0,26])
+            camera_base(pi_case_thickness,with_camera_back_mount);
+
+        translate([26/4-horizontal_snap_length/2,27/2,pi_case_thickness])
+            snap(horizontal_snap_length,snap_height,trap_a,trap_b);
+
+        translate([26*0.75-horizontal_snap_length/2,27/2,pi_case_thickness])
+            snap(horizontal_snap_length,snap_height,trap_a,trap_b);
+        //roundedcube([26,26,28], false, 2.7, "ymin");
+        translate([26/4*3-cylinder_snap_length/2,-27/2,pi_case_thickness-cylinder_radius-1.1])
+            rotate([0,90,0])
+            cylinder(cylinder_snap_length,r=cylinder_radius);
+
+        translate([26/4-cylinder_snap_length/2,-27/2,pi_case_thickness-cylinder_radius-1.1])
+            rotate([0,90,0])
+            cylinder(cylinder_snap_length,r=cylinder_radius);
+        //translate([26/2-horizontal_snap_length_2/2,-27/2,pi_case_thickness-1.])
+        //rotate([0,180,180])
+        //snap(horizontal_snap_length_2);
+
+    }
 }
 
-module base_with_fit(pi_case_thickness){
-    horizontal_snap_length_2=3;
 
-union(){    
-linear_extrude(pi_case_thickness)
-base_projection();
-    
-translate([26/4-horizontal_snap_length/2,27/2,pi_case_thickness])
-snap(horizontal_snap_length);
-
-translate([26*0.75-horizontal_snap_length/2,27/2,pi_case_thickness])
-snap(horizontal_snap_length);
-//roundedcube([26,26,28], false, 2.7, "ymin");
-//
-//translate([26/2-horizontal_snap_length_2/2,-27/2,pi_case_thickness-1])
-//rotate([0,180,180])
-//snap(horizontal_snap_length_2);
-     radius=0.5;
-translate([26/4*3-horizontal_snap_length_2/2,-27/2,pi_case_thickness-radius-1.1])
-rotate([0,90,0])
-cylinder(horizontal_snap_length_2,r=radius);
-
-translate([26/4-horizontal_snap_length_2/2,-27/2,pi_case_thickness-radius-1.1])
-rotate([0,90,0])
-cylinder(horizontal_snap_length_2,r=radius);    
-}
-}
-camera_base_with_fit(3);
-//base_with_fit(3);
+//camera_base_with_fit(3);
+//camera_base_with_fit(3, false, 0.6, 0.8,trap_a=0.68, trap_b=1.12, horizontal_snap_length=4.15,cylinder_snap_length=3.2);
