@@ -1,6 +1,7 @@
 $fa = 2;
 $fs = 0.25;
-Extra_Mount_Depth = 3;
+extra_depth=0;
+Extra_Mount_Depth = 3+extra_depth;
 
 module nut_hole()
 {
@@ -49,6 +50,11 @@ module mount2()
 		translate([0, 10.5, 0])
 		flap(3);
 	}
+
+//translate([0,45,0])
+//    	rotate([90, 0, 0])
+//    cylinder(h = 80, d = 19.5);
+
 }
 
 module mount3()
