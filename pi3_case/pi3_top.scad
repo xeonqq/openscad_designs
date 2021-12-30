@@ -2,6 +2,7 @@ include <roundedcube.scad>;
 include <camera_base_fit.scad>
 include <GoPro_Mount.scad>
 include <speaker_holder.scad>
+include <switch_holder.scad>
 
 speaker_wire_diameter=2.5;
 
@@ -35,19 +36,60 @@ mount2();
 }
 }
 
-module combined(){
-         rotate([180,0,180])
-import("pi3_base.stl");
-pi3_top();   
+module combined(type="all"){
+
+  
+    
+        if (type=="all"){pi3_top(); rotate([180,0,180])
+import("pi3_base.stl");}
+    else if (type=="top"){pi3_top(); }
+    else if (type=="bottom"){         rotate([180,0,180])
+import("pi3_base.stl");}
     }
 
+module holes_for_speaker_wire(i)
+{
+   translate([-29+(27.5/2-6),2,-6+1.5+i])
+   rotate([90,0,0])
+   cylinder(r=1.25,h=15);
+   
+    translate([-29+13,58.7+12.5,-6.+1.5+i])
+   rotate([90,0,0])
+   cylinder(r=1.25,h=15);
+}
 
 //intersection(){
+module pi_case(type="all"){
+    //type ["all", "top", "bottom"]
 union(){
-
-difference(){
-combined();
     
+translate([-29,-1.7,-6.])
+rotate([90,0,0])
+    if (type=="all"){speaker_holder();}
+    else if (type=="top"){speaker_holder_top();}
+    else if (type=="bottom"){speaker_holder_bottom();}
+
+translate([-29+2,58.7-1,-6.])
+rotate([90,0,180])
+    if (type=="all"){speaker_holder();}
+    else if (type=="top"){speaker_holder_top();}
+    else if (type=="bottom"){speaker_holder_bottom();}
+   
+   translate([15,57.7,7.-1.8])
+   rotate([-90,0,0])
+    if (type=="all"){switch_holder();}
+    else if (type=="top"){switch_holder_top();}
+    else if (type=="bottom"){switch_holder_bottom();}
+    
+//     translate([15,57.7,7.-1.8])
+//    rotate([-90,0,0])    
+//    translate([holder_thickness, holder_thickness,holder_thickness+extra_holder_bottom_thickness])
+//    switch(simplify=true);
+difference(){
+combined(type);
+    
+
+
 
 x_buffer=0.4;
 y_buffer=0.5;
@@ -66,28 +108,22 @@ roundedcube([18,1.6, 10], false, 0.5,"z");
 //cube([50,10,15]);
    
    //holes for speaker wire
-   translate([-29+(27.5/2-6),2,-6+1.5])
-   rotate([90,0,0])
-   cylinder(r=1.25,h=15);
-   
-    translate([-29+13,58.7+12.5,-6.+1.5])
-   rotate([90,0,0])
-   cylinder(r=1.25,h=15);
+    if (type=="all" || type=="bottom"){        holes_for_speaker_wire(0);}
+    else if (type=="top"){   
+        for (i = [0:0.1:3]){
+        holes_for_speaker_wire(i);
+       }
+   }}
+
+
+
+
+
    }
-
-
-
-
    }
-   
-translate([-29,-1.7,-6.])
-rotate([90,0,0])
-speaker_holder();
+//pi_case("bottom");
+   pi_case("top");
 
-translate([-29+2,58.7-1,-6.])
-rotate([90,0,180])
-speaker_holder();  
-   
    //translate([-15,-24,-20])
    //cube([30,60,20]);
    //}
