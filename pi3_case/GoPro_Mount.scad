@@ -1,6 +1,6 @@
 $fa = 2;
 $fs = 0.25;
-extra_depth=0;
+extra_depth=7.5;
 Extra_Mount_Depth = 3+extra_depth;
 
 module nut_hole()
@@ -49,6 +49,9 @@ module mount2()
 
 		translate([0, 10.5, 0])
 		flap(3);
+        		translate([10.5,3.5, -7.5])
+			cube([extra_depth, 5, 15]);
+
 	}
 
 //translate([0,45,0])

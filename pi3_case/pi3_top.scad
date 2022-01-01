@@ -88,8 +88,13 @@ rotate([90,0,180])
 difference(){
 combined(type);
     
-
-
+translate([-29+2,58.7-1,-6.])
+rotate([90,0,180])
+speaker();
+    
+    translate([-29,-1.7,-6.])
+rotate([90,0,0])
+    speaker();
 
 x_buffer=0.4;
 y_buffer=0.5;
