@@ -87,7 +87,7 @@ rotate([90,0,180])
 //    switch(simplify=true);
 difference(){
 combined(type);
-    
+if (type=="top"){    
 translate([-29+2,58.7-1,-6.])
 rotate([90,0,180])
 speaker();
@@ -95,6 +95,7 @@ speaker();
     translate([-29,-1.7,-6.])
 rotate([90,0,0])
     speaker();
+}
 
 x_buffer=0.4;
 y_buffer=0.5;
@@ -126,8 +127,8 @@ roundedcube([18,1.6, 10], false, 0.5,"z");
 
    }
    }
-//pi_case("bottom");
-   pi_case("top");
+pi_case("bottom");
+//   pi_case("top");
 
    //translate([-15,-24,-20])
    //cube([30,60,20]);

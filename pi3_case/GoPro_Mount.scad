@@ -77,7 +77,7 @@ module mount3()
 	}
 }
 
-//mount2();
+mount2();
 /* GoPro Mount - 2 flap no nut hole
 translate([0, 0, 10.5])
 	rotate([0, 90, 0])
