@@ -63,11 +63,11 @@ module pi_case(type="all"){
     //type ["all", "top", "bottom"]
 union(){
     
-translate([-29,-1.7,-6.])
-rotate([90,0,0])
-    if (type=="all"){speaker_holder();}
-    else if (type=="top"){speaker_holder_top();}
-    else if (type=="bottom"){speaker_holder_bottom();}
+//translate([-29,-1.7,-6.])
+//rotate([90,0,0])
+    //if (type=="all"){speaker_holder();}
+    //else if (type=="top"){speaker_holder_top();}
+    //else if (type=="bottom"){speaker_holder_bottom();}
 
 translate([-29+2,58.7-1,-6.])
 rotate([90,0,180])
@@ -92,16 +92,16 @@ translate([-29+2,58.7-1,-6.])
 rotate([90,0,180])
 speaker();
     
-    translate([-29,-1.7,-6.])
-rotate([90,0,0])
-    speaker();
+//    translate([-29,-1.7,-6.])
+//rotate([90,0,0])
+//    speaker();
 }
 
 x_buffer=0.4;
 y_buffer=0.5;
 
 scale([(26+x_buffer)/26,(27+y_buffer)/27,1])   
-translate([13,13,-17.2])
+translate([13,16,-17.2])
 rotate([0,0,180])
 
 camera_base_with_fit(3, false, 0.6, 0.8,trap_a=0.68, trap_b=1.12, horizontal_snap_length=4.15,cylinder_snap_length=3.2);    
@@ -130,40 +130,66 @@ roundedcube([18,1.6, 10], false, 0.5,"z");
 
 
 
-module mount_stengthener()
+module mount_stengthener(extra_buffer=0.)
 {
-   fit_body_connector_width=10;
-    fit_body_connector_height=2.5;
-    fit_body_connector_depth=2.2;
+   fit_body_connector_width=10+extra_buffer*2;
+    fit_body_connector_height=2.5+extra_buffer*2;
+    fit_body_connector_depth=2.3;
     
-       fit_mount_connector_width=3.5;
-    fit_mount_connector_height=2.6;
-    fit_mount_connector_depth=22;
+       fit_mount_connector_width=3.5+extra_buffer*2;
+    fit_mount_connector_height=2.6 + extra_buffer*2;
+    fit_mount_connector_depth=21;
     
+
     binding_length=21;
     binding_thickness=2.5;
+
+
+
+//base
+        base_h=5;
+    base_width=fit_body_connector_width*sqrt(2);
+           ratio=fit_mount_connector_height/fit_mount_connector_width;
+
+         translate([fit_body_connector_width/2,fit_mount_connector_height/2,0])
+
+scale([1,ratio,1])
    
+rotate([180,0,45]){
+    new_h=(fit_mount_connector_width/(fit_body_connector_width-fit_mount_connector_width)*base_h+base_h);
+            cylinder(d1=base_width, d2=0, h=new_h, $fn=4);
+       }
+   //binding
+       extra_length=(ratio*fit_body_connector_width-fit_mount_connector_height)/2;
+       translate([0,-extra_length,0])
+    roundedcube([fit_body_connector_width,binding_length+extra_length, binding_thickness], false, 0.5, "z");
+       
+       //fit body
    translate([0,binding_length-fit_body_connector_height,-fit_body_connector_depth])
-    cube([fit_body_connector_width,fit_body_connector_height, fit_body_connector_depth]);
+    roundedcube([fit_body_connector_width,fit_body_connector_height, fit_body_connector_depth], false, 0.5, "z");
     
-       cube([fit_body_connector_width,binding_length, binding_thickness]);
-    
-    cube([fit_body_connector_width,binding_length, binding_thickness]);
-    
+
+
+        //fit mount
     translate([fit_body_connector_width/2-fit_mount_connector_width/2,0,-fit_mount_connector_depth])
-    cube([fit_mount_connector_width,fit_mount_connector_height, fit_mount_connector_depth]);
+    roundedcube([fit_mount_connector_width,fit_mount_connector_height, fit_mount_connector_depth], false, 0.5, "z");
+
+
+
 
 }
 module case_combined()
 {
-    pi_case("bottom");
-  pi_case("top");
+  // pi_case("bottom");
+  //pi_case("top");
     }
     
-difference(){
-    case_combined();
+difference()
+    {
+    //case_combined();
 
-    
-translate([-7.2,-7.5, 5.2])
-mount_stengthener();
+    extra_buffer=0.0;
+translate([-7.2-extra_buffer,-7.5-extra_buffer, 5.2])
+mount_stengthener(extra_buffer);
 }
+   
