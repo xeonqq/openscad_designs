@@ -127,9 +127,43 @@ roundedcube([18,1.6, 10], false, 0.5,"z");
 
    }
    }
-pi_case("bottom");
-//   pi_case("top");
 
-   //translate([-15,-24,-20])
-   //cube([30,60,20]);
-   //}
+
+
+module mount_stengthener()
+{
+   fit_body_connector_width=10;
+    fit_body_connector_height=2.5;
+    fit_body_connector_depth=2.2;
+    
+       fit_mount_connector_width=3.5;
+    fit_mount_connector_height=2.6;
+    fit_mount_connector_depth=22;
+    
+    binding_length=21;
+    binding_thickness=2.5;
+   
+   translate([0,binding_length-fit_body_connector_height,-fit_body_connector_depth])
+    cube([fit_body_connector_width,fit_body_connector_height, fit_body_connector_depth]);
+    
+       cube([fit_body_connector_width,binding_length, binding_thickness]);
+    
+    cube([fit_body_connector_width,binding_length, binding_thickness]);
+    
+    translate([fit_body_connector_width/2-fit_mount_connector_width/2,0,-fit_mount_connector_depth])
+    cube([fit_mount_connector_width,fit_mount_connector_height, fit_mount_connector_depth]);
+
+}
+module case_combined()
+{
+    pi_case("bottom");
+  pi_case("top");
+    }
+    
+difference(){
+    case_combined();
+
+    
+translate([-7.2,-7.5, 5.2])
+mount_stengthener();
+}
