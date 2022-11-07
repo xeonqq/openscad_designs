@@ -107,7 +107,7 @@ rotate([0,0,180])
 camera_base_with_fit(3, false, 0.6, 0.8,trap_a=0.68, trap_b=1.12, horizontal_snap_length=4.15,cylinder_snap_length=3.2);    
     
     //ribbon hole
-    translate([-9,32,-20])
+    translate([-9,32+15.9,-20])
 roundedcube([18,1.6, 10], false, 0.5,"z");
     
 //    translate([-15,-10,-12])
@@ -181,14 +181,14 @@ rotate([180,0,45]){
 module case_combined()
 {
   // pi_case("bottom");
-  //pi_case("top");
+  pi_case("top");
     }
     
 difference()
     {
-    //case_combined();
+    case_combined();
 
-    extra_buffer=0.0;
+    extra_buffer=0.1;
 translate([-7.2-extra_buffer,-7.5-extra_buffer, 5.2])
 mount_stengthener(extra_buffer);
 }
