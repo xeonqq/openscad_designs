@@ -1,4 +1,5 @@
 include <roundedcube.scad>;
+include <../screws.scad>;
 
 
 sub_height=5;
@@ -98,7 +99,7 @@ teeth_spike_width=teeth_width-1.8;
 
 rack_width=15;
 rack_height=3;
-rack_length=100;
+rack_length=90;
 
 module gear_rack()
 {
@@ -108,6 +109,8 @@ module gear_rack()
     translate([teeth_interval*dy,0, 0])
         teeth();
     }
+
+
 }
 
 
@@ -120,6 +123,10 @@ module teeth()
     square([teeth_width,rack_width], center=true);
 
 }
-    //gear_rack();
-
+difference(){
+    gear_rack();
+    
+    translate([rack_length-10,rack_width/2,0])
+    screw_m3();
+}
 //teeth();
