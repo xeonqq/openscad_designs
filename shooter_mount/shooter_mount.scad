@@ -2,7 +2,7 @@ include<roundedcube.scad>;
     distance_two_holes = 32/2*sqrt(2);
 screw_cap_depth=2;
 screw_cap_r=5.5/2;
-keep_screw_cylinder=true; //change me
+keep_screw_cylinder=false; //change me
 
  tilt_support_thickness=4;
    tilt_angle=15;
@@ -38,11 +38,11 @@ module shooter_mount()
 }
 
 
-motors_distance=79;
+motors_distance=77-1;
 offset_from_edge=(length-motors_distance-distance_two_holes)/2;
 module shooter_mount_with_holes(){
 
-    //difference() // comment out if keep_screw_cylinder is true
+    difference() // comment out if keep_screw_cylinder is true
 {
     shooter_mount();
     offset_from_bar = (width-distance_two_holes)/2;
@@ -134,7 +134,10 @@ module shooter_mount_final(){
    }
    }
    
-
+shooter_mount_final();
+   
+   
+   
 tilt_width=pad_r*1.6+offset_from_edge;
          tilt_support_w = width+pad_r*2;
 
@@ -149,8 +152,9 @@ roundedcube([tilt_width,tilt_support_w, tilt_support_thickness], false, 1,"all")
 
  }
 
-
 screw_on_tilt_support_r=3.5/2;
+
+module tilted_support(){
  union(){
       rotate([tilt_angle,0,0])
 
@@ -164,7 +168,6 @@ screw_on_tilt_support_r=3.5/2;
 
      box_pad_holes();
                   
-  // rotate([tilt_angle,0,0])
   shooter_mount_final();
      }
  
@@ -177,7 +180,8 @@ screw_on_tilt_support_r=3.5/2;
      }
 
  } 
-
+ }
+//tilted_support();
      
  support_y_offset=-pad_r/2+tilt_support_w*cos(tilt_angle)-tilt_support_thickness;
 
