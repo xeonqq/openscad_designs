@@ -8,16 +8,16 @@ keep_screw_cylinder=false; //change me
    tilt_angle=15;
 
 
-    length=130;
+    length=130+50;
     width = 45;
  thickness=4;
  
 module motor_mounting_holes()
 {
-tolerance=0.2;
+tolerance=0.4;
     hole_r = (3+tolerance)/2;
     translate([distance_two_holes/2, distance_two_holes/2])
-   cylinder(h=10, r1=5.5, r2=5.5, $fn=30);
+   cylinder(h=10, r1=5.5+tolerance, r2=5.5+tolerance, $fn=30);
 
     for (x=[0,distance_two_holes])
     {
@@ -25,7 +25,7 @@ tolerance=0.2;
         {
         translate([x, y, 0]){
             cylinder(h=10, r1=hole_r, r2=hole_r, $fn=30);
-            cylinder(h=screw_cap_depth, r1=screw_cap_r, r2=screw_cap_r);
+            cylinder(h=screw_cap_depth, r1=screw_cap_r+tolerance, r2=screw_cap_r+tolerance);
         }
         }
     }
@@ -37,8 +37,7 @@ module shooter_mount()
     roundedcube([length,width, thickness], false, 1,"all");
 }
 
-
-motors_distance=77-1;
+motors_distance=77-1.5+50;
 offset_from_edge=(length-motors_distance-distance_two_holes)/2;
 module shooter_mount_with_holes(){
 
@@ -47,16 +46,17 @@ module shooter_mount_with_holes(){
     shooter_mount();
     offset_from_bar = (width-distance_two_holes)/2;
      z_offset=keep_screw_cylinder?-tilt_support_thickness:0;
-
-    for (i=[0,motors_distance]){
-           translate([offset_from_edge+i, offset_from_bar, z_offset])
-    motor_mounting_holes(); 
+    for (x_offset=[-2:1:2]){
+        for (i=[0+x_offset,motors_distance+x_offset]){
+               translate([offset_from_edge+i, offset_from_bar, z_offset])
+        motor_mounting_holes(); 
+            }
         }
     }
 }
 
-box_screw_r = 3/2;
-    pad_r = 5;
+box_screw_r = 4.2/2;
+    pad_r = 6;
 
 pad_length = length-pad_r/2;
 pad_width = width-pad_r/2;
@@ -128,8 +128,8 @@ module shooter_mount_final(){
     
    
     pad_on_box_screw_holes();
-      
-       translate([length/2, width/2, 0])
+      for(i = [-25:1:25])
+       translate([length/2+i, width/2, 0])
        cylinder(h=10, r1=11, r2=11);
    }
    }
