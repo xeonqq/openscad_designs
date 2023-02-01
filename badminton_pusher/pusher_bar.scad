@@ -2,25 +2,25 @@ include <../screws.scad>;
 include <../servo_mount/servo_mount.scad>;
 include <../roundedcube.scad>;
 
-bar_height=70;
-bar_thickness_at_end = 3;
+bar_height=55;
+bar_thickness_at_end = 4;
 bar_bottom_thick_section_h = 23;
 bar_top_thin_section_h =bar_height-bar_bottom_thick_section_h;
 narrow_side_w=rack_width/2;
-hole_h = bar_top_thin_section_h*0.85;
+hole_h = bar_top_thin_section_h*0.7;//0.85;
 buffer=0.5;
 screw_diameter=3 + buffer;
 module bar(){
 linear_extrude(bar_bottom_thick_section_h, scale=[1,bar_thickness_at_end/narrow_side_w])
 square([rack_width,narrow_side_w], center=true);
-roundedcube([rack_width,narrow_side_w+15,2], center=true);
+roundedcube([rack_width,narrow_side_w+15,3], center=true);
 
 
 
 difference(){
 translate([0,0,bar_bottom_thick_section_h+bar_top_thin_section_h/2])
 difference(){
-cube([rack_width, 3,bar_top_thin_section_h], center=true);
+cube([rack_width, bar_thickness_at_end,bar_top_thin_section_h], center=true);
 
 cube([screw_diameter,10, hole_h],center=true);
 }

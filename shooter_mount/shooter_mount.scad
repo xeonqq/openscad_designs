@@ -39,6 +39,7 @@ module shooter_mount()
 
 motors_distance=77-1.5+50;
 offset_from_edge=(length-motors_distance-distance_two_holes)/2;
+echo(offset_from_edge);
 module shooter_mount_with_holes(){
 
     difference() // comment out if keep_screw_cylinder is true

@@ -170,6 +170,6 @@ translate([0,-3-cap_r-cube_thickness+1])
 connection();
 }
 }
-holder_with_bearing();
+//holder_with_bearing();
 //connection_with_holes();
-//cap_with_connection_and_servo();
+cap_with_connection_and_servo();
