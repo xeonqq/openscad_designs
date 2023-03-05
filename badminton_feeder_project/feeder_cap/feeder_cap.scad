@@ -40,7 +40,8 @@ difference()
 difference(){
     
     shell();
-    translate([0,0,wall_thickness])
+    
+   // translate([0,0,wall_thickness])
     inter_cylinder();
     cylinder_open(); 
 }

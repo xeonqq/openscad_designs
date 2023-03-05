@@ -1,5 +1,5 @@
 include<../roundedcube.scad>;
-include<../servo_mount/servo_mount.scad>;
+//include<../servo_mount/servo_mount.scad>;
 
 
 total_h = 22.5;
