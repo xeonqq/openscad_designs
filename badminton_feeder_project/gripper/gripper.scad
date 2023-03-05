@@ -94,13 +94,24 @@ hole_fitter();
 
 module gear2_with_gear_ring()
 {
-    r_small_screw=1.7/2+0.1;
+    r_small_screw=1.7/2+0.2;
+    r=20.6/2+0.1;
+    h=2.3+1.3;
     difference()
     {
-    gear2();
-    r=20.6/2+0.1;
-    h=2.3;
-    translate([-10,4+0.01,-1.5])
+        union(){
+            translate([-10,4+0.01-h,-1.])
+            rotate([90,0,0]){
+                difference(){
+            cylinder(h=1, r1=r+1.5,r2=r+1.5, $fn=100);
+            cylinder(h=1, r1=r-5.5,r2=r-5.5, $fn=100);
+                }
+            }
+            gear2();
+
+        }
+
+    translate([-10,4+0.01,-1.])
     rotate([90,0,0]){
             
             cylinder(h=h, r1=r,r2=r, $fn=100);
@@ -110,7 +121,7 @@ module gear2_with_gear_ring()
             cylinder(h=10, r1=r_small_screw,r2=r_small_screw, $fn=100);
     }
     }
-    }
+}
 //gear1();
 
 //gear2();
@@ -152,6 +163,6 @@ cylinder(h=m3_nut_h,r1=r_i,r2=r_i,$fn=200);
 //mirror([0,0,1])
 //gear1_with_bearing();
 
-//gear2_with_gear_ring();
+gear2_with_gear_ring();
 
-grip_link_enhanced();
+//grip_link_enhanced();
