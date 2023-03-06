@@ -11,16 +11,28 @@ difference()
     width= servo_w+extra_w;
 
 union(){
+        cube_h=3;
+
     translate([-(length-servo_l)/2,-extra_w,22.5])
-    cube([length, width, 3]);
+    cube([length, width, cube_h]);
+    
+
+    difference(){
+    translate([-(length-servo_l)/2,-extra_w,22.5+5.5+cube_h])
+     cube([length, width, cube_h]);
+         translate([servo_l/2,-4+3+3+0.2+10.5,31.5])
+        cube([45.1,30,h], center=true);
+         translate([servo_l/2,-4+3,31.5])
+        cube([15,9,h], center=true);
+ 
+        }
 
 
-
-translate([servo_l/2,-0.5-2,31.5])
-vertical_bar();
+          translate([servo_l/2,-0.5-2,31.5])
+        vertical_bar(); 
 }
 
-translate([servo_l,0,0])
+translate([servo_l,0,-1])
 rotate([0,0,90])
 {
     mg996r();
