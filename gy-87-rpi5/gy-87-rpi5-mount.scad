@@ -15,6 +15,7 @@ wall_thickness = 1.2;
 screw_d = 3;
 hole_x_near_offset = 1.23;
 r=3.3/2;
+r2=2.7/2;
 
 hole_x_offset = length-margin/2- (hole_x_near_offset+r);
 hole_y_offset = 0.8;
@@ -24,9 +25,13 @@ roundedcube([length+pi_screw_gap+wall_thickness,height+wall_thickness*2,total_th
 
         cube([length,height+5,chip_thickness]);
         
-        translate([length+wall_thickness, 5,-2])
+        translate([length+wall_thickness, 5+4.5,-2])
         cube([length,height+5,10]);
-
+        
+        pin_w = 1.2;
+        pin_y_offset_wrt_hole = 5.4;
+        translate([length+wall_thickness, hole_y_offset+r-pin_w/2+pin_y_offset_wrt_hole,-2])
+        cube([3.6,pin_w,10]);
 
         {
         translate([hole_x_offset, hole_y_offset+r, -5])
@@ -34,7 +39,7 @@ roundedcube([length+pi_screw_gap+wall_thickness,height+wall_thickness*2,total_th
         }
                 {
         translate([hole_x_offset+pi_screw_gap, hole_y_offset+r, -5])
-        cylinder(r=r, h=10);
+        cylinder(r=r2, h=10);
         }
     }
 }
