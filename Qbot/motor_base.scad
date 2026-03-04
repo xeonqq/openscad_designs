@@ -1,4 +1,5 @@
 include<../roundedcube.scad>;
+include<../badminton_feeder_project/servo_9g/9g_servo_holder.scad>;
 
 wheel_diameter = 66.5; // mm
 wheel_width=26;
@@ -13,6 +14,7 @@ distance_two_holes_x=14;
 // |
 // ---->x
 caster_hole_diameter = 4.5;
+caster_center_hole_diameter = 8;
 caster_hole_spacing_x = 35;//27.5;
 caster_hole_spacing_y = 27.5;
 caster_edge_margin = 5;
@@ -275,6 +277,7 @@ distance_to_side_edge=8;
 module caster_mount_holes()
 {
     caster_hole_r = caster_hole_diameter/2;
+    caster_center_hole_r = caster_center_hole_diameter/2;
 
     translate([caster_center_x - caster_hole_spacing_x/2, caster_center_y - caster_hole_spacing_y/2, 0])
     for (x=[0, caster_hole_spacing_x])
@@ -285,6 +288,9 @@ module caster_mount_holes()
             cylinder(h=10, r=caster_hole_r, $fn=30);
         }
     }
+
+    translate([caster_center_x, caster_center_y, 0])
+    cylinder(h=10, r=caster_center_hole_r, $fn=40);
 }
 
 module control_board_mount_holes()
@@ -406,10 +412,13 @@ module battery_strap_holes()
     w=23;
     l=2.2;
     battery_w=35;
+    battery_strap_center_triangle_side = 10;
+    battery_strap_center_triangle_r = battery_strap_center_triangle_side/sqrt(3);
     translate([-battery_w/2, 0, 0])
     roundedcube([l, w, 2* thickness], center=true);
     translate([battery_w/2, 0, 0])
     roundedcube([l, w, 2* thickness], center=true);
+    cylinder(h=2*thickness, r=battery_strap_center_triangle_r, $fn=3, center=true);
 }
 
 module battery_support()
@@ -495,4 +504,5 @@ battery_strap_holes();
 translate([width/4-0.2,rear_axis_y,thickness])
 imu_and_pin();
 }
-    
+translate([width/2, length+w/2-1.5,1])
+servo_mount();

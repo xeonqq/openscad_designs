@@ -1,5 +1,7 @@
 include<9g_servo.scad>
 include<../screws.scad>
+include<../../roundedcube.scad>;
+
 
 tube_inner_r = 69.5/2+0.5;
 cap_r = 75/2+0.3;
@@ -16,7 +18,7 @@ difference()
 {
 
     //translate([0,cap_r+cap_thickness+servo_width/2-2.6+1.5,2.6-0.5])
-    cube([servo_length+5, w, 2], center=true);
+    roundedcube([servo_length+5, w, cap_thickness], center=true);
     
     translate([0,1,z_offset])
     {
@@ -32,9 +34,13 @@ difference()
 }
 }
 h=13;
-servo_mount();
 
-translate([0,-w/2+3,-h/2+1-2])
+module servo_mount_with_attacher()
+{
+    union(){
+   servo_mount();
+    
+     translate([0,-w/2+3,-h/2+1-2])
 difference(){
 translate([0,-3/2,0])
 cube([15,3,h], center=true);
@@ -52,4 +58,11 @@ cylinder(r=(5.75/cos(30))/2, h=2.2, $fn=6);
     rotate([90,0,0])
 cylinder(r=3.2/2, h=10, $fn=20);
 }
+}   
+        
+        }
+
 }
+//servo_mount();
+
+//servo_mount_with_attacher();
