@@ -109,6 +109,53 @@ module four_mounting_screws()
     cylinder(h=10, r1=5, r2=5);
 
 }
+
+module encoder_clearance_cutout(left_side=true)
+{
+    // Built from sketch dimensions, referenced to the 4-hole pattern.
+    // Local frame is identical to four_mounting_screws():
+    // (0,0)=bottom-left hole, (distance_two_holes_x, distance_two_holes_y)=top-right hole.
+    top_cube_w = 5;
+    top_cube_h = 14;
+    bottom_cube_w = 12.3;
+    bottom_cube_h = 6.3;
+
+    // Measured offsets from the top-right motor hole on the LEFT side sketch.
+    ref_to_top_left_x = 29;
+    bottom_left_from_top_left_x = 5.2;
+
+    ref_x = distance_two_holes_x;
+    ref_y = distance_two_holes_y;
+    cut_h = thickness + 2;
+
+    module left_pattern()
+    {
+        // Left side requirement: top cube sits left of bottom cube.
+        top_left_x = ref_x + ref_to_top_left_x;
+        bottom_left_x = top_left_x + bottom_left_from_top_left_x;
+        // Keep X from sketch, align cube center in Y with big motor-hole center.
+        joint_y = ref_y/2 - top_cube_h/2;
+
+        translate([top_left_x, joint_y, -1])
+        cube([top_cube_w, top_cube_h, cut_h], center=false);
+
+        //translate([bottom_left_x, joint_y - bottom_cube_h, -1])
+        //cube([bottom_cube_w, bottom_cube_h, cut_h], center=false);
+    }
+
+    if (left_side)
+    {
+        left_pattern();
+    }
+    else
+    {
+        // Right side is the left sketch rotated 180 deg around hole-pattern center.
+        translate([distance_two_holes_x/2, distance_two_holes_y/2, 0])
+        rotate([0, 0, 180])
+        translate([-distance_two_holes_x/2, -distance_two_holes_y/2, 0])
+        left_pattern();
+    }
+}
 distance_two_supporting_screws=34.5-3;
 
 module two_supporting_screws(d=3)
@@ -284,9 +331,13 @@ difference()
     base();
     translate([distance_to_side_edge,motor_mount_origin_y,0])
 four_mounting_screws();
+    translate([distance_to_side_edge,motor_mount_origin_y,0])
+encoder_clearance_cutout(left_side=true);
 
 translate([width-distance_to_side_edge-distance_two_holes_x,motor_mount_origin_y,0])
 four_mounting_screws();
+translate([width-distance_to_side_edge-distance_two_holes_x,motor_mount_origin_y,0])
+encoder_clearance_cutout(left_side=false);
 
 control_board_mount_holes();
 //aux_board_mount_holes();
