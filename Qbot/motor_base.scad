@@ -8,6 +8,11 @@ wheelbase_factor = 2.75;
 wheel_base=wheel_diameter*wheelbase_factor;
 width =  wheel_base-wheel_width-2*wheel_body_gap;
 thickness=4;
+trailer_hitch_length = 9;
+trailer_hitch_root_width = 16;
+trailer_hitch_tip_width = 7;
+trailer_hitch_hole_diameter = 3.2; // M3 clearance
+trailer_hitch_hole_tip_offset = 5;
 distance_two_holes_y=19.7-3.5;
 distance_two_holes_x=14;
 // y
@@ -88,8 +93,25 @@ module base(thickness=thickness)
         extra_length_to_cover_edge=2;
         translate([stem_origin_x, rear_bar_depth-extra_length_to_cover_edge, 0])
         roundedcube([stem_width, length+extra_length_to_cover_edge-rear_bar_depth, thickness], radius=1, center=false);
+
+        // Rear trailer hitch tab (trapezoid) extending from the tail.
+        translate([0,1,0])
+        linear_extrude(height=thickness)
+        polygon([
+            [width/2 - trailer_hitch_root_width/2, 0],
+            [width/2 + trailer_hitch_root_width/2, 0],
+            [width/2 + trailer_hitch_tip_width/2, -trailer_hitch_length],
+            [width/2 - trailer_hitch_tip_width/2, -trailer_hitch_length]
+        ]);
     }
 }
+
+module trailer_hitch_hole(h=10)
+{
+    translate([width/2, -trailer_hitch_length + trailer_hitch_hole_tip_offset, 0])
+    cylinder(h=h, r=trailer_hitch_hole_diameter/2, $fn=30);
+}
+
 module four_mounting_screws()
 {
     tolerance=0.2;
@@ -348,6 +370,7 @@ encoder_clearance_cutout(left_side=false);
 control_board_mount_holes();
 //aux_board_mount_holes();
 caster_mount_holes();
+trailer_hitch_hole();
     
 //    //supporting 4 screws
 //    translate([supporting_screw_distance_to_side_edge,(length-distance_two_supporting_screws)/2,0])
@@ -389,6 +412,7 @@ module battery_mount_base()
 difference()
 {
     base(thickness=3);
+    trailer_hitch_hole();
         //supporting 4 screws
     translate([supporting_screw_distance_to_side_edge,(length-distance_two_supporting_screws)/2,0])
 two_supporting_screws(d=3.4);
@@ -504,5 +528,6 @@ battery_strap_holes();
 translate([width/4-0.2,rear_axis_y,thickness])
 imu_and_pin();
 }
-translate([width/2, length+w/2-1.5,1])
+translate([width/2, length+w/2-1.5,1.5])
+scale([1, 1, 1.5])
 servo_mount();
