@@ -109,7 +109,7 @@ module base(thickness=thickness)
 module trailer_hitch_hole(h=10)
 {
     translate([width/2, -trailer_hitch_length + trailer_hitch_hole_tip_offset, 0])
-    cylinder(h=h, r=trailer_hitch_hole_diameter/2, $fn=30);
+    nut_with_screw(r=trailer_hitch_hole_diameter/2, nut_z_offset=thickness/2);
 }
 
 module four_mounting_screws()
@@ -208,7 +208,8 @@ module screw(r, cap_r, cap_thick=1, h=20)
 }
 
 
-module nut_with_screw(r){
+module nut_with_screw(r, nut_z_offset=0){
+translate([0,0,nut_z_offset])
 cylinder(r=(5.95/cos(30))/2, h=2.2, $fn=6);
 cylinder(r=r, h=20, $fn=20); 
 }
