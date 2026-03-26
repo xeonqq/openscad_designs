@@ -26,6 +26,10 @@ coral_rotated       = true;    // rotate 90° to align with control board
 coral_pat_x = coral_rotated ? coral_hole_spacing_y : coral_hole_spacing_x;  // 42
 coral_pat_y = coral_rotated ? coral_hole_spacing_x : coral_hole_spacing_y;  // 58
 
+// ─── Camera-bracket attach holes (M3, on front extension) ───
+cam_attach_spacing_x = 20;     // horizontal spacing of 2 × M3 holes
+cam_attach_hole_d    = 3.2;    // M3 clearance
+
 // ─── Plate geometry ───
 edge_margin    = 5;            // mm around outermost holes
 plate_thick    = 3;            // mm
@@ -33,15 +37,22 @@ corner_r       = 2;            // rounded-corner radius
 standoff_h     = 8;            // height of Coral-board standoffs
 standoff_r     = 3.5;          // outer radius of each standoff
 
-plate_w = max(ctrl_pat_x, coral_pat_x) + 2 * edge_margin;
-plate_l = max(ctrl_pat_y, coral_pat_y) + 2 * edge_margin;
+cam_extension  = 18;           // extra length at front for camera bracket
+
+plate_w     = max(ctrl_pat_x, coral_pat_x) + 2 * edge_margin;
+plate_l_base = max(ctrl_pat_y, coral_pat_y) + 2 * edge_margin;
+plate_l     = plate_l_base + cam_extension;
 
 cx = plate_w / 2;              // plate centre X
-cy = plate_l / 2;              // plate centre Y
+cy = plate_l_base / 2;         // board-area centre Y (not counting extension)
+
+// Camera-attach holes centred in the extension zone
+cam_attach_cy = plate_l_base + cam_extension / 2;
 
 echo("Plate size:", plate_w, "×", plate_l, "×", plate_thick);
 echo("Control-board pattern (on plate):", ctrl_pat_x, "×", ctrl_pat_y);
 echo("Coral pattern (on plate):", coral_pat_x, "×", coral_pat_y);
+echo("Camera-attach holes Y:", cam_attach_cy);
 
 // ─── Modules ─────────────────────────────────────────────────
 
@@ -88,6 +99,15 @@ module coral_holes()
                 cylinder(h = plate_thick + standoff_h + 2, r = r, $fn = 30);
 }
 
+// 2 M3 holes in the front extension for the camera bracket
+module cam_attach_holes()
+{
+    r = cam_attach_hole_d / 2;
+    for (x = [-cam_attach_spacing_x/2, cam_attach_spacing_x/2])
+        translate([cx + x, cam_attach_cy, -1])
+            cylinder(h = plate_thick + 2, r = r, $fn = 30);
+}
+
 // ─── Final assembly ──────────────────────────────────────────
 
 module coral_mini_mount()
@@ -101,6 +121,7 @@ module coral_mini_mount()
         }
         ctrl_holes();
         coral_holes();
+        cam_attach_holes();
     }
 }
 
