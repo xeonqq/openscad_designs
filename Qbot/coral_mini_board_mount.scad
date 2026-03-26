@@ -117,7 +117,7 @@ module coral_mini_mount()
         union()
         {
             plate();
-            coral_standoffs();
+            //coral_standoffs();
         }
         ctrl_holes();
         coral_holes();

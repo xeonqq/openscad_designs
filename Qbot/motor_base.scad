@@ -23,7 +23,8 @@ caster_center_hole_diameter = 8;
 caster_hole_spacing_x = 35;//27.5;
 caster_hole_spacing_y = 27.5;
 caster_edge_margin = 5;
-caster_distance_to_rear_axis = wheel_base*0.4;
+caster_distance_to_rear_axis = wheel_base*0.5;
+servo_caster_gap = 20;         // extra Y gap between caster holes and servo
 
 control_board_hole_spacing_x = 72;
 control_board_hole_spacing_y = 48;
@@ -61,7 +62,7 @@ control_board_center_y = rear_bar_depth/2 + control_board_pattern_y/2;
 aux_board_center_x = width/2;
 aux_board_center_y = rear_bar_depth/2 + aux_board_pattern_y/2 - aux_board_back_offset;
 length = max(
-    caster_center_y + caster_hole_spacing_y/2 + caster_edge_margin,
+    caster_center_y + caster_hole_spacing_y/2 + caster_edge_margin + servo_caster_gap,
     control_board_center_y + control_board_pattern_y/2 + control_board_edge_margin,
     aux_board_center_y + aux_board_pattern_y/2 + control_board_edge_margin
 );
@@ -519,16 +520,166 @@ battery_support();
 }
 }
 
+// ─── Front Wing (detachable bumper with bearing M3 holes) ────
+// Mini-4WD style front wing with side-bypass arms that go around
+// the servo 9g and bolt onto the base front edge with M3 screws.
+
+wing_arm_length      = 40;        // how far each swept arm extends sideways
+wing_arm_width       = 8;         // swept arm cross-section width
+wing_thickness       = thickness; // same thickness as base
+wing_attach_h        = 6;         // attach tab height (sits ON TOP of base)
+wing_attach_pad_r    = 7;         // attach pad radius (bigger = stronger)
+wing_center_w        = 30;        // center bar width
+wing_center_d        = 8;         // center bar depth (Y)
+wing_bearing_hole_d  = 3.2;       // M3 clearance for bearing screw
+wing_bearing_standoff_r = 5;      // pad radius around bearing hole
+wing_sweep_angle     = 45;        // arm sweep angle from X axis
+
+// Servo clearance
+servo_mount_w        = servo_length + 5 + 2;  // servo holder X width + clearance
+servo_center_y       = length + w/2 - 1.5;    // servo center Y
+servo_front_y        = servo_center_y + w/2;  // servo front edge Y
+
+// Wing front bar sits just past the servo
+wing_gap_from_servo  = 2;
+wing_bar_y           = servo_front_y + wing_gap_from_servo;
+
+// Side bypass arms: run alongside the servo, from base front to wing bar
+wing_side_arm_w      = 8;         // width of each side bypass arm
+wing_side_arm_gap    = 2;         // gap between servo and side arm
+
+// X positions of the side arms (outside the servo)
+wing_side_arm_left_x  = width/2 - servo_mount_w/2 - wing_side_arm_gap - wing_side_arm_w;
+wing_side_arm_right_x = width/2 + servo_mount_w/2 + wing_side_arm_gap;
+
+// Attach holes on the base: at the rear end of the side arms
+wing_attach_hole_d   = 3.2;       // M3 clearance
+wing_attach_y        = length - 5; // M3 hole Y on the base (near front edge)
+
+// Attach tab X centers
+wing_attach_left_cx  = wing_side_arm_left_x + wing_side_arm_w/2;
+wing_attach_right_cx = wing_side_arm_right_x + wing_side_arm_w/2;
+
+// ─── Wing attach holes (go through base + wing attach tab) ──
+module wing_attach_hole_pattern()
+{
+    r = wing_attach_hole_d / 2;
+    full_h = thickness + wing_attach_h+2;
+    translate([wing_attach_left_cx, wing_attach_y, -1])
+        cylinder(h = full_h, r = r, $fn = 30);
+    translate([wing_attach_right_cx, wing_attach_y, -1])
+        cylinder(h = full_h, r = r, $fn = 30);
+}
+
+// ─── Attach pads on the BASE ────────────────────────────────
+module base_wing_attach_pads()
+{
+    // Slightly larger pads on the base for the screw head to sit on
+    for (cx = [wing_attach_left_cx, wing_attach_right_cx])
+        translate([cx, wing_attach_y, 0])
+            cylinder(h = thickness, r = wing_attach_pad_r, $fn = 60);
+}
+
+// ─── Front wing (separate detachable part) ───────────────────
+module front_wing()
+{
+    // Side bypass arms: sit on top of base (Z = thickness)
+    // and run alongside the servo from attach point to wing bar
+    for (sx = [wing_side_arm_left_x, wing_side_arm_right_x])
+    {
+        translate([sx, wing_attach_y - wing_attach_pad_r+2, thickness])
+            roundedcube([wing_side_arm_w,
+                         wing_bar_y - (wing_attach_y - wing_attach_pad_r) + wing_center_d/2,
+                         wing_thickness],
+                        radius = 1, center = false);
+    }
+
+    // Thick attach tabs at the rear of each side arm
+    // These sit ON TOP of the base (Z = thickness), tall enough for the screw
+    for (cx = [wing_attach_left_cx, wing_attach_right_cx])
+    {
+        translate([cx, wing_attach_y, thickness])
+            cylinder(h = thickness, r = wing_attach_pad_r, $fn = 60);
+    }
+
+    // Center front bar connecting the two side arms
+    translate([wing_side_arm_left_x, wing_bar_y, thickness])
+        roundedcube([wing_side_arm_right_x + wing_side_arm_w - wing_side_arm_left_x,
+                     wing_center_d, wing_thickness],
+                    radius = 1, center = false);
+
+    // Left and right swept arms + bearing pads
+    for (side = [-1, 1])
+    {
+        arm_start_x = width/2 + side * (wing_center_w/2);
+        arm_start_y = wing_bar_y + wing_center_d/2;
+
+        arm_end_x = arm_start_x + side * wing_arm_length * cos(wing_sweep_angle);
+        arm_end_y = arm_start_y + wing_arm_length * sin(wing_sweep_angle);
+
+        hull()
+        {
+            translate([arm_start_x, arm_start_y, thickness])
+                cylinder(h = wing_thickness, r = wing_arm_width/2, $fn = 60);
+            translate([arm_end_x, arm_end_y, thickness])
+                cylinder(h = wing_thickness, r = wing_arm_width/2, $fn = 60);
+        }
+
+        // Bearing pad at tip
+        translate([arm_end_x, arm_end_y, thickness])
+            cylinder(h = wing_thickness, r = wing_bearing_standoff_r, $fn = 60);
+    }
+}
+
+module front_wing_holes()
+{
+    r = wing_bearing_hole_d / 2;
+
+    for (side = [-1, 1])
+    {
+        arm_start_x = width/2 + side * (wing_center_w/2);
+        arm_start_y = wing_bar_y + wing_center_d/2;
+        arm_end_x = arm_start_x + side * wing_arm_length * cos(wing_sweep_angle);
+        arm_end_y = arm_start_y + wing_arm_length * sin(wing_sweep_angle);
+
+        translate([arm_end_x, arm_end_y, thickness - 1])
+            cylinder(h = wing_thickness + 2, r = r, $fn = 30);
+    }
+}
+
+module front_wing_part()
+{
+    difference()
+    {
+        front_wing();
+        front_wing_holes();
+        wing_attach_hole_pattern();
+    }
+}
+
 //battery_mount();
+
+// ─── Base plate (with wing attach pads & holes) ─────────────
 difference()
 {
-base_with_screw_holes();
-translate([width/2, length/2-5, 1])
-battery_strap_holes();
+    union()
+    {
+        base_with_screw_holes();
+        base_wing_attach_pads();
+    }
+    wing_attach_hole_pattern();
 
-translate([width/4-0.2,rear_axis_y,thickness])
-imu_and_pin();
+    translate([width/2, length/2-5, 1])
+    battery_strap_holes();
+
+    translate([width/4-0.2,rear_axis_y,thickness])
+    imu_and_pin();
 }
+
+// Servo 9g
 translate([width/2, length+w/2-1.5,1.5])
 scale([1, 1, 1.5])
 servo_mount();
+
+// Front wing (shown assembled — comment out to print separately)
+//front_wing_part();
