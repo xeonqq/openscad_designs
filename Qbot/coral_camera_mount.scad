@@ -183,5 +183,4 @@ module coral_camera_mount()
     }
 }
 
-// Rotate so the front wall lies flat on the print bed
 coral_camera_mount();
