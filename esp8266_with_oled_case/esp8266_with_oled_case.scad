@@ -50,6 +50,14 @@ snap_protrusion = 0.5;  // how far the tab sticks out
 snap_thickness = 1.0;   // tab thickness in Z
 lip_height = 2.0;       // inner lip on base for cover alignment
 
+/* [LED Hole] */
+led_hole_dia = 3.0;     // LED viewing hole diameter
+led_from_corner = 6.5;  // distance from board bottom-right corner
+
+/* [Zip Tie Holes] */
+zip_hole_dia = 3.5;     // diameter of zip tie hole
+zip_corner_inset = 8.0; // how far hole center is from outer corner
+
 /* [Rendering] */
 $fn = 50;
 explode = 0;            // set > 0 to separate parts for viewing
@@ -147,6 +155,12 @@ module base() {
         usb_z = board_oz + pcb_thickness/2 - usb_h/2;
         translate([-0.1, board_oy + board_h/2 - usb_w/2, usb_z])
             cube([wall + 0.2, usb_w, usb_h]);
+
+        // Zip tie holes - one near each corner
+        for (cx = [zip_corner_inset, case_outer_w - zip_corner_inset])
+            for (cy = [zip_corner_inset, case_outer_h - zip_corner_inset])
+                translate([cx, cy, -0.1])
+                    cylinder(h = floor_t + 0.2, d = zip_hole_dia);
     }
 }
 
@@ -202,6 +216,12 @@ module cover() {
             // Right groove (X=max inner wall)
             translate([cover_outer_w - wall - snap_protrusion - 0.1, cover_outer_h/2 - snap_w/2 - 0.1, groove_z])
                 cube([snap_protrusion + 0.3, snap_w + 0.2, snap_thickness + 0.3]);
+
+            // LED hole through cover roof (bottom-right of board)
+            led_cover_x = ox + board_ox + board_w - led_from_corner;
+            led_cover_y = oy + board_oy + led_from_corner;
+            translate([led_cover_x, led_cover_y, roof_z - 0.1])
+                cylinder(h = roof_t + 0.2, d = led_hole_dia);
 
             // USB clearance in cover skirt (left side)
             translate([-0.1, oy + board_oy + board_h/2 - usb_w/2 - 0.5, -0.1])
