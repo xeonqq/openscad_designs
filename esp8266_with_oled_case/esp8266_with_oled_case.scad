@@ -8,7 +8,7 @@ board_thickness = 6;    // Z - total height with all components
 pcb_thickness = 1.6;    // PCB thickness alone
 
 /* [Case Parameters] */
-wall = 1.8;             // wall thickness
+wall = 1.4;             // wall thickness
 floor_t = 1.5;          // base floor thickness
 roof_t = 1.5;           // cover roof thickness
 clearance = 0.3;        // gap around board edges
@@ -41,8 +41,8 @@ button_hole_dia = 6;              // round hole in cover roof for pressing from 
 button_extra_front = button_protrusion + 1; // extra case space at front for button
 
 /* [USB Port - left wall cutout] */
-usb_w = 8.5;            // micro-USB width
-usb_h = 4;              // micro-USB height
+usb_w = 11;             // micro-USB width (inc. cable clearance)
+usb_h = 8;              // micro-USB height (inc. cable clearance)
 
 /* [Snap Fit Parameters] */
 snap_w = 8;             // length of each snap tab
@@ -105,17 +105,6 @@ module base() {
                 translate([wall, wall, floor_t])
                     cube([case_inner_w, case_inner_h, base_total_z]);
             }
-
-            // Inner lip for cover alignment (thin wall inside, at top)
-            lip_wall = 1.0;
-            translate([wall + clearance/2, wall + clearance/2, base_total_z - lip_height])
-                difference() {
-                    cube([case_inner_w - clearance, case_inner_h - clearance, lip_height]);
-                    translate([lip_wall, lip_wall, -0.1])
-                        cube([case_inner_w - clearance - lip_wall*2,
-                              case_inner_h - clearance - lip_wall*2,
-                              lip_height + 0.2]);
-                }
 
             // 4 mounting posts
             translate([board_ox, board_oy, floor_t]) {
@@ -233,7 +222,7 @@ module cover() {
 // === ASSEMBLY ===
 // Both parts shown together (use explode > 0 to separate)
 color("SteelBlue", 0.85) base();
-color("Orange", 0.7) cover();
+//color("Orange", 0.7) cover();
 
 // === FOR 3D PRINTING ===
 // Uncomment ONE of these and comment out the assembly above:
