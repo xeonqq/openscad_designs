@@ -58,7 +58,7 @@ standoff_h_cam  = 1.5;
 standoff_r_cam  = 2.5;
 
 // Lens aperture
-lens_aperture_d = cam_lens_d + 1;
+lens_aperture_d = cam_lens_d + 0.7;
 
 // ─── Derived positions ──────────────────────────────────────
 // Everything starts at Z=0 (flat bottom for 3D printing)
@@ -98,10 +98,9 @@ module housing_shell()
             translate([wall, -1, foot_thick])
                 cube([housing_inner_w, housing_inner_d + 1, housing_inner_h]);
 
-            // Lens aperture through the front wall
-            translate([housing_w/2, housing_d - wall - 1, cam_center_z])
-                rotate([-90, 0, 0])
-                    cylinder(h = wall + 2, r = lens_aperture_d/2, $fn = 50);
+            // Lens aperture through the front wall (square)
+            translate([housing_w/2 - lens_aperture_d/2, housing_d - wall - 1, cam_center_z - lens_aperture_d/2])
+                cube([lens_aperture_d, wall + 2, lens_aperture_d]);
 
             // Ribbon cable slot through the bottom wall
             translate([housing_w/2 - ribbon_w/2, -1, 0])
