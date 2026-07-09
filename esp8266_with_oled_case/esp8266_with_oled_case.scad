@@ -17,12 +17,12 @@ post_height = 1.5;      // mounting posts lift PCB off floor
 /* [Mounting Holes - distance from board edges to hole center] */
 hole_dia = 2.0;         // M2 PCB mounting holes
 post_dia = 4.5;         // outer diameter of support posts
-pin_dia = 1.8;          // pin that goes into PCB hole
+pin_dia = 2.2;          // pin that goes into PCB hole
 pin_h = 2.5;            // pin height above post
 hole_from_left = 2.5;
 hole_from_right = 2.5;
-hole_from_top = 2.5;
-hole_from_bottom = 2.5;
+hole_from_top = 2.1;    // set so post Y spacing = 23mm
+hole_from_bottom = 2.1; // set so post Y spacing = 23mm
 
 /* [OLED Display Window] */
 oled_from_left = 8;             // display window X start from board left
@@ -37,7 +37,7 @@ button_protrusion = 8.5;          // how far button hangs below board bottom edg
 button_body_h = 6.8;              // button body height (Z, for clearance)
 button_x_right = board_w - button_right_edge_from_right; // right edge X on board
 button_x_center = button_x_right - button_body_w / 2;   // center X on board
-button_hole_dia = 6;              // round hole in cover roof for pressing from top
+button_hole_dia = 7;              // round hole in cover roof for pressing from top
 button_extra_front = button_protrusion + 1; // extra case space at front for button
 
 /* [USB Port - left wall cutout] */
@@ -70,7 +70,7 @@ case_outer_h = case_inner_h + wall * 2;
 
 // Z split: base holds board on posts, cover clears top of components
 // Base interior height: post + full board thickness + small gap
-base_interior_z = post_height + board_thickness + 0.5;
+base_interior_z = post_height + board_thickness + 0.5 -1.8;
 // Cover drops down with a lip that fits inside base walls
 cover_lip_z = lip_height;
 
@@ -129,7 +129,7 @@ module base() {
             // Button holding bars (two rails on either side of button body)
             // Aligned with button_case_x (center), rails go full height to top of base walls
             btn_bar_w = 1.2;    // bar thickness in X
-            btn_bar_h = base_interior_z/2;  // full internal height (flush with base walls)
+            btn_bar_h = base_interior_z/5*3;  // full internal height (flush with base walls)
             btn_bar_y_start = wall + clearance + 0.5;
             btn_bar_y_len = button_extra_front - 1;
             // Left bar (left edge of button body = button_x_center - button_body_w/2)
@@ -138,6 +138,13 @@ module base() {
             // Right bar (right edge of button body = button_x_center + button_body_w/2)
             translate([board_ox + button_x_center + button_body_w/2 + 0.3, btn_bar_y_start, floor_t])
                 cube([btn_bar_w, btn_bar_y_len, btn_bar_h]);
+
+            // Button support cubes (two cubes on floor to lift thin button up)
+            btn_sup = base_interior_z - 4.1;  // interior height minus button height
+            btn_sup_x_off = 5;          // spacing from button center in X
+            for (dx = [-btn_sup_x_off, btn_sup_x_off])
+                translate([button_case_x + dx - btn_sup/2, button_case_y - 6/2, floor_t])
+                    cube([btn_sup, 6, btn_sup]);
         }
 
         // USB port cutout (left wall, centered vertically on board)
@@ -222,7 +229,7 @@ module cover() {
 // === ASSEMBLY ===
 // Both parts shown together (use explode > 0 to separate)
 color("SteelBlue", 0.85) base();
-//color("Orange", 0.7) cover();
+color("Orange", 0.7) cover();
 
 // === FOR 3D PRINTING ===
 // Uncomment ONE of these and comment out the assembly above:
