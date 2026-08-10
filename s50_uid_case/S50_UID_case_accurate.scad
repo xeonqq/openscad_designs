@@ -201,20 +201,18 @@ module back_shell() {
 }
 
 // ===================== FRONT LID =====================
-
 module front_lid() {
     outer_extra = SIDE_WALL + CLEARANCE;
-    inner_extra = CLEARANCE + 0.10;
+
+    // 乐高凸粒参数
+    LEGO_STUD_DIAMETER = 4.8;
+    LEGO_STUD_HEIGHT = 1.8;
+    LEGO_STUD_PITCH = 8.0;
 
     // Overall lid plate
     difference() {
         linear_extrude(height=FRONT_WALL)
             s50_outline_2d(outer_extra);
-
-        // Main circular viewing / NFC opening.
-        // Keep the center open so the tag face remains accessible.
-        //translate([0,FACE_OPENING_Y,-0.2])
-            //cylinder(d=FACE_OPENING_D, h=FRONT_WALL+0.4);
 
         // Key-ring slot
         translate([0,SLOT_Y,-0.2])
@@ -225,8 +223,13 @@ module front_lid() {
             decorative_slots(-0.2,2.0);
     }
 
-    // Rear locating lip: slides into the back shell.
-    // It is a continuous ring, interrupted near the key-ring slot.
+    // 两个乐高凸粒
+    translate([-LEGO_STUD_PITCH/2, TAG_H/2, FRONT_WALL])
+        cylinder(d=LEGO_STUD_DIAMETER, h=LEGO_STUD_HEIGHT, $fn=48);
+    translate([LEGO_STUD_PITCH/2, TAG_H/2, FRONT_WALL])
+        cylinder(d=LEGO_STUD_DIAMETER, h=LEGO_STUD_HEIGHT, $fn=48);
+
+    // Rear locating lip
     difference() {
         translate([0,0,-SNAP_HEIGHT])
             linear_extrude(height=SNAP_HEIGHT)
@@ -236,7 +239,6 @@ module front_lid() {
             linear_extrude(height=SNAP_HEIGHT+0.2)
                 s50_outline_2d(SIDE_WALL + CLEARANCE - SNAP_CLEARANCE - 1.1);
 
-        // Keep the top ring area open
         translate([0,SLOT_Y,0])
             rounded_slot(SLOT_W+2.0,SLOT_H+1.0,SLOT_H/2,-SNAP_HEIGHT-0.2,SNAP_HEIGHT+0.5);
     }
