@@ -27,7 +27,7 @@ $fn = 96;
 // USER PARAMETERS
 // ============================================================
 
-PART = "exploded";
+PART = "front";
 
 // Original tag dimensions
 TAG_W = 32.0;
