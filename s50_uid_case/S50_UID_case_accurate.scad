@@ -28,7 +28,7 @@ $fn = 96;
 // USER PARAMETERS
 // ============================================================
 
-PART = "front";
+PART = "both";
 
 // Original tag dimensions
 TAG_W = 32.0;
@@ -44,14 +44,16 @@ SIDE_WALL  = 1.35;
 FRONT_WALL = 1.20;
 
 // ------------------------------------------------------------
-// SNAP FIT (bottle-cap style: skirt wraps OVER the back wall)
+// SNAP FIT (discrete tabs, same idea as esp8266_with_oled_case.scad)
 // ------------------------------------------------------------
 // The front cover no longer tries to insert INSIDE the tag
 // cavity (that space is only CLEARANCE wide and already fully
 // occupied by the back shell's own SIDE_WALL). Instead, like
 // esp8266_with_oled_case.scad, the front has a down-turned
 // skirt that wraps around the OUTSIDE of the back shell's
-// outer wall, with a snap ridge/groove to hold it on.
+// outer wall, and a few discrete snap tabs click the two
+// halves together (rather than one continuous ring, which
+// would need the whole skirt to flex at once).
 
 // Radial clearance between the skirt's inner bore and the back wall's outer face
 SKIRT_CLEARANCE = 0.25;
@@ -62,13 +64,16 @@ SKIRT_WALL = 1.0;
 // How far the skirt drops down over the back shell's outer wall
 SKIRT_HEIGHT = 3.0;
 
-// Continuous snap ridge molded onto the back shell's outer wall
-RIDGE_BUMP = 0.40;     // how far the ridge sticks out radially
-RIDGE_HEIGHT = 1.20;   // height (Z) of the ridge band
-RIDGE_FROM_TOP = 1.40; // distance down from the top of the back wall to the ridge
+// Tabs are placed around the circular body (0=right, 90=top, 180=left),
+// away from the key-ring slot near the bottom of the tag
+TAB_ANGLES = [0, 90, 180];
 
-// Extra clearance in the mating groove so the ridge can seat without a tight press
-GROOVE_CLEARANCE = 0.15;
+TAB_WIDTH     = 6.0;  // tangential width of each tab
+TAB_BUMP      = 0.40; // how far each tab sticks out radially
+TAB_HEIGHT    = 1.60; // Z height of each tab
+TAB_FROM_TOP  = 0.60; // distance down from the top of the back wall to the tabs
+TAB_CLEARANCE = 0.15; // extra clearance in the matching groove
+RELIEF_SLIT_W = 0.7;  // width of the flex slits cut beside each tab in the skirt
 
 
 // ============================================================
@@ -249,6 +254,53 @@ module decorative_slots()
 
 
 // ============================================================
+// SNAP TAB (male bump on the back wall / female groove in the skirt)
+// ============================================================
+
+/*
+   theta places the tab around the circular body (which is a
+   true circle of radius TAG_W/2+SIDE_WALL+CLEARANCE, centered
+   at [0,25]), z is the bottom of the tab band, and clearance=0
+   builds the male bump while clearance=TAB_CLEARANCE builds the
+   matching oversized female groove.
+*/
+module snap_tab(theta, z, clearance=0)
+{
+    R = TAG_W/2 + SIDE_WALL + CLEARANCE;
+
+    x0  = R - 0.4 - clearance;
+    len = TAB_BUMP + 0.4 + 2*clearance;
+    tw  = TAB_WIDTH + 2*clearance;
+    th  = TAB_HEIGHT + 2*clearance;
+
+    translate([0,25,0])
+        rotate([0,0,theta])
+            translate([x0, -tw/2, z-clearance])
+                cube([len, tw, th]);
+}
+
+
+/*
+   Two thin full-height slits flanking a tab, cut through the
+   front skirt only. This turns the skirt into independent
+   cantilever fingers at each tab so a finger can flex over its
+   own bump without needing the whole closed ring to stretch.
+*/
+module skirt_relief_cuts(theta)
+{
+    R = TAG_W/2 + SIDE_WALL + CLEARANCE;
+    half_gap = TAB_WIDTH/2 + 0.8;
+    len = SKIRT_CLEARANCE + SKIRT_WALL + 1.0;
+
+    translate([0,25,0])
+        rotate([0,0,theta])
+            for (s = [-1,1])
+                translate([R-0.5, s*half_gap - RELIEF_SLIT_W/2, -SKIRT_HEIGHT-0.1])
+                    cube([len, RELIEF_SLIT_W, SKIRT_HEIGHT+0.2]);
+}
+
+
+// ============================================================
 // BACK SHELL
 // ============================================================
 
@@ -310,46 +362,20 @@ module back_shell()
 
 
     // ========================================================
-    // OUTER SNAP RIDGE
+    // SNAP TABS (esp8266-style discrete tabs, not a full ring)
     // ========================================================
 
     /*
-       A thin ridge running around the OUTSIDE of the back wall,
+       A handful of small tabs on the OUTSIDE of the back wall,
        near its top edge. The front cover's skirt wraps over the
-       wall and its inner groove catches on this ridge, the same
-       way a bottle cap snaps onto a bottle.
+       wall and its matching grooves click onto these tabs.
     */
 
     back_total_h = BACK_WALL + TAG_T + 0.35;
+    tab_z = back_total_h - TAB_FROM_TOP - TAB_HEIGHT;
 
-    difference()
-    {
-        translate([
-            0,
-            0,
-            back_total_h - RIDGE_FROM_TOP - RIDGE_HEIGHT
-        ])
-            linear_extrude(height=RIDGE_HEIGHT)
-                s50_outline_2d(OUTER_EXTRA + RIDGE_BUMP);
-
-        translate([
-            0,
-            0,
-            back_total_h - RIDGE_FROM_TOP - RIDGE_HEIGHT - 0.1
-        ])
-            linear_extrude(height=RIDGE_HEIGHT + 0.2)
-                s50_outline_2d(OUTER_EXTRA);
-
-
-        // Keep key-ring opening clear
-        translate([0,SLOT_Y,-0.2])
-            linear_extrude(height=back_total_h + 0.5)
-                rounded_slot(
-                    SLOT_W + 2.0,
-                    SLOT_H + 1.0,
-                    SLOT_H/2
-                );
-    }
+    for (theta = TAB_ANGLES)
+        snap_tab(theta, tab_z);
 }
 
 
@@ -415,16 +441,15 @@ module front_lid()
             linear_extrude(height=SKIRT_HEIGHT+0.2)
                 s50_outline_2d(OUTER_EXTRA + SKIRT_CLEARANCE);
 
-        // Snap groove: locally widen the bore so the back wall's
-        // ridge can pop in and seat (skirt must flex slightly to
-        // get past the ridge on the way down)
-        translate([
-            0,
-            0,
-            -RIDGE_FROM_TOP - RIDGE_HEIGHT - GROOVE_CLEARANCE
-        ])
-            linear_extrude(height=RIDGE_HEIGHT + 2*GROOVE_CLEARANCE)
-                s50_outline_2d(OUTER_EXTRA + RIDGE_BUMP + GROOVE_CLEARANCE);
+        // Snap grooves: match the back wall's tabs so the skirt
+        // must flex slightly to click over each one
+        for (theta = TAB_ANGLES)
+            snap_tab(theta, -TAB_FROM_TOP - TAB_HEIGHT, TAB_CLEARANCE);
+
+        // Relief slits: isolate each tab into its own flexible
+        // finger instead of requiring the whole closed skirt to stretch
+        for (theta = TAB_ANGLES)
+            skirt_relief_cuts(theta);
 
         // Don't block key-ring slot
         translate([
@@ -450,32 +475,22 @@ module front_lid()
     /*
        Outside face of the front cover.
 
-       Studs are at Y = 20.5 mm, which puts them around the
-       center of the 41 mm tag rather than at Y=41.
+       Studs form a 2x2 grid centered at Y = 20.5 mm, which puts
+       them around the center of the 41 mm tag rather than at Y=41.
     */
 
-    translate([
-        -LEGO_STUD_PITCH/2,
-        TAG_H/2,
-        FRONT_WALL
-    ])
-        cylinder(
-            d=LEGO_STUD_DIAMETER,
-            h=LEGO_STUD_HEIGHT,
-            $fn=48
-        );
-
-
-    translate([
-        LEGO_STUD_PITCH/2,
-        TAG_H/2,
-        FRONT_WALL
-    ])
-        cylinder(
-            d=LEGO_STUD_DIAMETER,
-            h=LEGO_STUD_HEIGHT,
-            $fn=48
-        );
+    for (dx = [-LEGO_STUD_PITCH/2, LEGO_STUD_PITCH/2])
+        for (dy = [-LEGO_STUD_PITCH/2, LEGO_STUD_PITCH/2])
+            translate([
+                dx,
+                TAG_H/2 + dy,
+                FRONT_WALL
+            ])
+                cylinder(
+                    d=LEGO_STUD_DIAMETER,
+                    h=LEGO_STUD_HEIGHT,
+                    $fn=48
+                );
 }
 
 
@@ -492,7 +507,7 @@ module assembled()
        skirt dropping down by SKIRT_HEIGHT to wrap over the wall
        and snap onto the ridge.
     */
-
+color("Orange", 0.7) 
     back_shell();
 
     translate([
@@ -500,6 +515,7 @@ module assembled()
         0,
         BACK_WALL + TAG_T + 0.35
     ])
+    color("SteelBlue", 0.7) 
         front_lid();
 }
 
