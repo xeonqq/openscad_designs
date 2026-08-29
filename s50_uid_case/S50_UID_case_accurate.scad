@@ -28,7 +28,7 @@ $fn = 96;
 // USER PARAMETERS
 // ============================================================
 
-PART = "both";
+PART = "front";
 
 // Original tag dimensions
 TAG_W = 32.0;
@@ -87,7 +87,7 @@ SLOT_W = 6.3;
 SLOT_H = 3.4;
 SLOT_Y = 4.0;
 
-KEEP_DECORATIVE_SLOTS = true;
+KEEP_DECORATIVE_SLOTS = false;
 
 
 // ============================================================
@@ -350,7 +350,7 @@ module back_shell()
         // ----------------------------------------------------
         // Key ring opening
         // ----------------------------------------------------
-
+        if (KEEP_DECORATIVE_SLOTS){
         translate([0,SLOT_Y,-0.5])
             linear_extrude(height=3.0)
                 rounded_slot(
@@ -358,6 +358,7 @@ module back_shell()
                     SLOT_H,
                     SLOT_H/2
                 );
+        }
     }
 
 
@@ -406,6 +407,7 @@ module front_lid()
 
 
         // Key-ring hole
+        if (KEEP_DECORATIVE_SLOTS){
         translate([0,SLOT_Y,-0.5])
             linear_extrude(height=FRONT_WALL+1.0)
                 rounded_slot(
@@ -413,6 +415,7 @@ module front_lid()
                     SLOT_H,
                     SLOT_H/2
                 );
+        }
 
 
         // Decorative holes
