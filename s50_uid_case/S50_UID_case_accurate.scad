@@ -95,7 +95,7 @@ KEEP_DECORATIVE_SLOTS = false;
 // LEGO STUDS
 // ============================================================
 
-LEGO_STUD_DIAMETER = 4.8;
+LEGO_STUD_DIAMETER = 4.9;
 LEGO_STUD_HEIGHT   = 1.8;
 LEGO_STUD_PITCH    = 8.0;
 
