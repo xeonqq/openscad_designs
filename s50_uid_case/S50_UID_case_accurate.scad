@@ -68,12 +68,13 @@ SKIRT_HEIGHT = 3.0;
 // away from the key-ring slot near the bottom of the tag
 TAB_ANGLES = [0, 90, 180];
 
-TAB_WIDTH     = 6.0;  // tangential width of each tab
+TAB_WIDTH     = 8.0;  // tangential width of each tab
 TAB_BUMP      = 0.40; // how far each tab sticks out radially
 TAB_HEIGHT    = 1.60; // Z height of each tab
 TAB_FROM_TOP  = 0.60; // distance down from the top of the back wall to the tabs
-TAB_CLEARANCE = 0.15; // extra clearance in the matching groove
+TAB_CLEARANCE = 0.12; // extra clearance in the matching groove
 RELIEF_SLIT_W = 0.7;  // width of the flex slits cut beside each tab in the skirt
+RELIEF_SLIT_HEIGHT = 2.0; // vertical height of each flex slit
 
 
 // ============================================================
@@ -281,7 +282,7 @@ module snap_tab(theta, z, clearance=0)
 
 
 /*
-   Two thin full-height slits flanking a tab, cut through the
+    Two thin slits flanking a tab, cut through part of the
    front skirt only. This turns the skirt into independent
    cantilever fingers at each tab so a finger can flex over its
    own bump without needing the whole closed ring to stretch.
@@ -295,8 +296,8 @@ module skirt_relief_cuts(theta)
     translate([0,25,0])
         rotate([0,0,theta])
             for (s = [-1,1])
-                translate([R-0.5, s*half_gap - RELIEF_SLIT_W/2, -SKIRT_HEIGHT-0.1])
-                    cube([len, RELIEF_SLIT_W, SKIRT_HEIGHT+0.2]);
+                translate([R-0.5, s*half_gap - RELIEF_SLIT_W/2, -RELIEF_SLIT_HEIGHT-0.1])
+                    cube([len, RELIEF_SLIT_W, RELIEF_SLIT_HEIGHT+0.1]);
 }
 
 
