@@ -99,6 +99,13 @@ LEGO_STUD_DIAMETER = 4.9;
 LEGO_STUD_HEIGHT   = 1.8;
 LEGO_STUD_PITCH    = 8.0;
 
+// Hollow cylinder alternative
+CENTER_FEATURE = "cylinder";  // "lego" or "cylinder"
+
+CYLINDER_D      = 18.5;
+CYLINDER_WALL   = 1.2;
+CYLINDER_HEIGHT = 2.0;
+
 
 // ============================================================
 // BEZIER
@@ -483,18 +490,48 @@ module front_lid()
        them around the center of the 41 mm tag rather than at Y=41.
     */
 
-    for (dx = [-LEGO_STUD_PITCH/2, LEGO_STUD_PITCH/2])
-        for (dy = [-LEGO_STUD_PITCH/2, LEGO_STUD_PITCH/2])
+    if (CENTER_FEATURE == "lego")
+    {
+        for (dx = [-LEGO_STUD_PITCH/2, LEGO_STUD_PITCH/2])
+            for (dy = [-LEGO_STUD_PITCH/2, LEGO_STUD_PITCH/2])
+                translate([
+                    dx,
+                    TAG_H/2 + dy,
+                    FRONT_WALL
+                ])
+                    cylinder(
+                        d=LEGO_STUD_DIAMETER,
+                        h=LEGO_STUD_HEIGHT,
+                        $fn=48
+                    );
+    }
+    else if (CENTER_FEATURE == "cylinder")
+    {
+        difference()
+        {
             translate([
-                dx,
-                TAG_H/2 + dy,
+                0,
+                TAG_H/2,
                 FRONT_WALL
             ])
                 cylinder(
-                    d=LEGO_STUD_DIAMETER,
-                    h=LEGO_STUD_HEIGHT,
-                    $fn=48
+                    d=CYLINDER_D,
+                    h=CYLINDER_HEIGHT,
+                    $fn=96
                 );
+
+            translate([
+                0,
+                TAG_H/2,
+                FRONT_WALL - 0.1
+            ])
+                cylinder(
+                    d=CYLINDER_D - 2*CYLINDER_WALL,
+                    h=CYLINDER_HEIGHT + 0.2,
+                    $fn=96
+                );
+        }
+    }
 }
 
 
