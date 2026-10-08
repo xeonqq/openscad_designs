@@ -102,7 +102,7 @@ LEGO_STUD_PITCH    = 8.0;
 // Hollow cylinder alternative
 CENTER_FEATURE = "cylinder";  // "lego" or "cylinder"
 
-CYLINDER_D      = 18.5;
+CYLINDER_D      = 18;
 CYLINDER_WALL   = 1.2;
 CYLINDER_HEIGHT = 2.0;
 
@@ -515,7 +515,7 @@ module front_lid()
                 FRONT_WALL
             ])
                 cylinder(
-                    d=CYLINDER_D,
+                    d=CYLINDER_D+2*CYLINDER_WALL,
                     h=CYLINDER_HEIGHT,
                     $fn=96
                 );
@@ -526,7 +526,7 @@ module front_lid()
                 FRONT_WALL - 0.1
             ])
                 cylinder(
-                    d=CYLINDER_D - 2*CYLINDER_WALL,
+                    d=CYLINDER_D ,
                     h=CYLINDER_HEIGHT + 0.2,
                     $fn=96
                 );
