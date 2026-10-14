@@ -58,8 +58,8 @@ FRONT_WALL = 1.20;
 // Radial clearance between the skirt's inner bore and the back wall's outer face
 SKIRT_CLEARANCE = 0.25;
 
-// Wall thickness of the front cover's down-turned skirt
-SKIRT_WALL = 1.0;
+// Wall thickness of the front cover's down-turned skirt; reinforced to reduce side-wall breakage
+SKIRT_WALL = 1.5;
 
 // How far the skirt drops down over the back shell's outer wall
 SKIRT_HEIGHT = 3.0;
