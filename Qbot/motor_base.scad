@@ -43,7 +43,7 @@ aux_board_pattern_x = aux_board_mount_rotated ? aux_board_hole_spacing_y : aux_b
 aux_board_pattern_y = aux_board_mount_rotated ? aux_board_hole_spacing_x : aux_board_hole_spacing_y;
 aux_board_back_offset = 6;
 
-rear_bar_motor_margin = 5;
+rear_bar_motor_margin = 8;
 rear_bar_rear_margin = 5;
 rear_bar_depth = distance_two_holes_y + 2*rear_bar_motor_margin;
 // Rear axis passes through the motor-hole pattern center.
@@ -55,6 +55,13 @@ stem_width = max(
     control_board_pattern_x + 2*control_board_edge_margin
 );
 stem_origin_x = (width - stem_width)/2;
+
+// Triangular gussets at the two inside corners where the stem meets the
+// rear bar. The T junction is the highest-stress area of the plate.
+stem_gusset_length = 30;  // reach along the stem (Y)
+stem_gusset_width  = 20;  // reach along the rear bar (X)
+stem_gusset_raise  = 0;   // extra height above the base plate (0 = flush)
+
 caster_center_x = width/2;
 caster_center_y = rear_axis_y + caster_distance_to_rear_axis;
 control_board_center_x = width/2;
@@ -83,6 +90,31 @@ echo("caster center:", [caster_center_x, caster_center_y]);
 echo("control board center:", [control_board_center_x, control_board_center_y]);
 echo("aux board center:", [aux_board_center_x, aux_board_center_y]);
 assert(width > 65*2, "Computed length must be larger than 2 motor body lengths.");
+assert(stem_gusset_width < (width - stem_width)/2, "Stem gusset is wider than the free bar beside the stem.");
+assert(stem_gusset_length < length - rear_bar_depth, "Stem gusset runs past the front edge.");
+
+module stem_gussets(h=thickness)
+{
+    // Slight overlap so the triangles fuse cleanly with both bars.
+    overlap = 1;
+    gusset_h = h + stem_gusset_raise;
+
+    for (side = [0, 1])
+    {
+        // x0 = concave corner of the junction, sx = outward direction.
+        x0 = side == 0 ? stem_origin_x : stem_origin_x + stem_width;
+        sx = side == 0 ? -1 : 1;
+
+        translate([0, 0, 0])
+        linear_extrude(height=gusset_h)
+        polygon([
+            [x0 - sx*overlap, rear_bar_depth + stem_gusset_length],
+            [x0 - sx*overlap, rear_bar_depth - overlap],
+            [x0 + sx*stem_gusset_width, rear_bar_depth - overlap]
+        ]);
+    }
+}
+
 module base(thickness=thickness)
 {
     union()
@@ -94,6 +126,9 @@ module base(thickness=thickness)
         extra_length_to_cover_edge=2;
         translate([stem_origin_x, rear_bar_depth-extra_length_to_cover_edge, 0])
         roundedcube([stem_width, length+extra_length_to_cover_edge-rear_bar_depth, thickness], radius=1, center=false);
+
+        // Gussets joining the stem to the rear bar.
+        stem_gussets(thickness);
 
         // Rear trailer hitch tab (trapezoid) extending from the tail.
         translate([0,1,0])
