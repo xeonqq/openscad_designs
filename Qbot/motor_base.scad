@@ -23,7 +23,7 @@ caster_hole_spacing_x = 35;//27.5;
 caster_hole_spacing_y = 27.5;
 caster_edge_margin = 5;
 // Shorten the plate by pulling the caster toward the rear axle.
-chassis_shorten = 0;          // mm removed from the overall plate length
+chassis_shorten = 5;          // mm removed from the overall plate length
 caster_distance_to_rear_axis = wheel_base*0.5 - chassis_shorten;
 
 control_board_hole_spacing_x = 72;
@@ -31,6 +31,7 @@ control_board_hole_spacing_y = 48;
 control_board_hole_diameter = 3.2; // M3 clearance
 control_board_edge_margin = 4;
 control_board_mount_rotated = true;
+control_board_offset_y = 10;  // shift the hole pattern toward the front
 
 control_board_pattern_x = control_board_mount_rotated ? control_board_hole_spacing_y : control_board_hole_spacing_x;
 control_board_pattern_y = control_board_mount_rotated ? control_board_hole_spacing_x : control_board_hole_spacing_y;
@@ -65,7 +66,7 @@ stem_gusset_raise  = 0;   // extra height above the base plate (0 = flush)
 caster_center_x = width/2;
 caster_center_y = rear_axis_y + caster_distance_to_rear_axis;
 control_board_center_x = width/2;
-control_board_center_y = rear_bar_depth/2 + control_board_pattern_y/2;
+control_board_center_y = rear_bar_depth/2 + control_board_pattern_y/2 + control_board_offset_y;
 aux_board_center_x = width/2;
 aux_board_center_y = rear_bar_depth/2 + aux_board_pattern_y/2 - aux_board_back_offset;
 length = max(
