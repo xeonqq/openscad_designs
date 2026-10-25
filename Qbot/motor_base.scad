@@ -1,5 +1,4 @@
 include<../roundedcube.scad>;
-include<../badminton_feeder_project/servo_9g/9g_servo_holder.scad>;
 
 wheel_diameter = 66.5; // mm
 wheel_width=26;
@@ -23,8 +22,9 @@ caster_center_hole_diameter = 8;
 caster_hole_spacing_x = 35;//27.5;
 caster_hole_spacing_y = 27.5;
 caster_edge_margin = 5;
-caster_distance_to_rear_axis = wheel_base*0.5;
-servo_caster_gap = 20;         // extra Y gap between caster holes and servo
+// Shorten the plate by pulling the caster toward the rear axle.
+chassis_shorten = 0;          // mm removed from the overall plate length
+caster_distance_to_rear_axis = wheel_base*0.5 - chassis_shorten;
 
 control_board_hole_spacing_x = 72;
 control_board_hole_spacing_y = 48;
@@ -69,7 +69,7 @@ control_board_center_y = rear_bar_depth/2 + control_board_pattern_y/2;
 aux_board_center_x = width/2;
 aux_board_center_y = rear_bar_depth/2 + aux_board_pattern_y/2 - aux_board_back_offset;
 length = max(
-    caster_center_y + caster_hole_spacing_y/2 + caster_edge_margin + servo_caster_gap,
+    caster_center_y + caster_hole_spacing_y/2 + caster_edge_margin,
     control_board_center_y + control_board_pattern_y/2 + control_board_edge_margin,
     aux_board_center_y + aux_board_pattern_y/2 + control_board_edge_margin
 );
@@ -85,6 +85,8 @@ assert(aux_board_center_y + aux_board_pattern_y/2 <= length, "Aux board holes ex
 echo("wheel base:",wheel_base);
 echo("base width:",width);
 echo("base length:",length);
+echo("chassis shorten:",chassis_shorten);
+echo("caster center to front edge:",length - caster_center_y);
 echo("rear axis y:",rear_axis_y);
 echo("caster center:", [caster_center_x, caster_center_y]);
 echo("control board center:", [control_board_center_x, control_board_center_y]);
@@ -556,8 +558,8 @@ battery_support();
 }
 
 // ─── Front Wing (detachable bumper with bearing M3 holes) ────
-// Mini-4WD style front wing with side-bypass arms that go around
-// the servo 9g and bolt onto the base front edge with M3 screws.
+// Mini-4WD style front wing with side arms that bolt onto
+// the base front edge with M3 screws.
 
 wing_arm_length      = 40;        // how far each swept arm extends sideways
 wing_arm_width       = 8;         // swept arm cross-section width
@@ -570,22 +572,18 @@ wing_bearing_hole_d  = 3.2;       // M3 clearance for bearing screw
 wing_bearing_standoff_r = 5;      // pad radius around bearing hole
 wing_sweep_angle     = 45;        // arm sweep angle from X axis
 
-// Servo clearance
-servo_mount_w        = servo_length + 5 + 2;  // servo holder X width + clearance
-servo_center_y       = length + w/2 - 1.5;    // servo center Y
-servo_front_y        = servo_center_y + w/2;  // servo front edge Y
+// Wing front bar sits just past the front edge
+wing_gap_from_edge   = 2;
+wing_bar_y           = length + wing_gap_from_edge;
 
-// Wing front bar sits just past the servo
-wing_gap_from_servo  = 2;
-wing_bar_y           = servo_front_y + wing_gap_from_servo;
+// Side arms: run from the base front edge to the wing bar
+wing_side_arm_w      = 8;         // width of each side arm
+// Kept wide enough that the attach pads clear the front caster holes.
+wing_side_arm_offset = 25;        // arm inner edge from the centerline
 
-// Side bypass arms: run alongside the servo, from base front to wing bar
-wing_side_arm_w      = 8;         // width of each side bypass arm
-wing_side_arm_gap    = 2;         // gap between servo and side arm
-
-// X positions of the side arms (outside the servo)
-wing_side_arm_left_x  = width/2 - servo_mount_w/2 - wing_side_arm_gap - wing_side_arm_w;
-wing_side_arm_right_x = width/2 + servo_mount_w/2 + wing_side_arm_gap;
+// X positions of the side arms
+wing_side_arm_left_x  = width/2 - wing_side_arm_offset - wing_side_arm_w;
+wing_side_arm_right_x = width/2 + wing_side_arm_offset;
 
 // Attach holes on the base: at the rear end of the side arms
 wing_attach_hole_d   = 3.2;       // M3 clearance
@@ -618,8 +616,8 @@ module base_wing_attach_pads()
 // ─── Front wing (separate detachable part) ───────────────────
 module front_wing()
 {
-    // Side bypass arms: sit on top of base (Z = thickness)
-    // and run alongside the servo from attach point to wing bar
+    // Side arms: sit on top of base (Z = thickness)
+    // and run from the attach point to the wing bar
     for (sx = [wing_side_arm_left_x, wing_side_arm_right_x])
     {
         translate([sx, wing_attach_y - wing_attach_pad_r+2, thickness])
@@ -710,11 +708,6 @@ difference()
     translate([width/4-0.2,rear_axis_y,thickness])
     imu_and_pin();
 }
-
-// Servo 9g
-translate([width/2, length+w/2-1.5,1.5])
-scale([1, 1, 1.5])
-servo_mount();
 
 // Front wing (shown assembled — comment out to print separately)
 //front_wing_part();
