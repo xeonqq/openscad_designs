@@ -22,6 +22,8 @@ caster_center_hole_diameter = 8;
 caster_hole_spacing_x = 35;//27.5;
 caster_hole_spacing_y = 27.5;
 caster_edge_margin = 5;
+caster_screw_cap_diameter = 8.7; // washer-head screw cap
+caster_screw_cap_depth = 1;      // cap recess from the top face
 // Shorten the plate by pulling the caster toward the rear axle.
 chassis_shorten = 5;          // mm removed from the overall plate length
 caster_distance_to_rear_axis = wheel_base*0.5 - chassis_shorten;
@@ -348,6 +350,8 @@ module caster_mount_holes()
         {
             translate([x, y, 0])
             cylinder(h=10, r=caster_hole_r, $fn=30);
+            translate([x, y, thickness - caster_screw_cap_depth])
+            cylinder(h=caster_screw_cap_depth + 1, r=caster_screw_cap_diameter/2, $fn=30);
         }
     }
 
