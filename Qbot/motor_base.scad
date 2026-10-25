@@ -48,7 +48,7 @@ rear_bar_rear_margin = 5;
 rear_bar_depth = distance_two_holes_y + 2*rear_bar_motor_margin;
 // Rear axis passes through the motor-hole pattern center.
 rear_axis_y = rear_bar_rear_margin + distance_two_holes_y/2;
-motor_mount_origin_y = rear_axis_y - distance_two_holes_y/2;
+motor_mount_origin_y = rear_axis_y - distance_two_holes_y/2+rear_bar_rear_margin/2;
 
 stem_width = max(
     caster_hole_spacing_x + 2*caster_edge_margin,
