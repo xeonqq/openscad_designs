@@ -461,13 +461,31 @@ translate([width-supporting_screw_distance_to_side_edge,(length-distance_two_sup
 two_supporting_screws(d=3.4);
 }
 }
+// Battery pack: 10.6 cm long, lying along the stem and centered on the
+// strap slots.
+battery_length = 106;
+battery_width = 26;
+battery_center_y = length/2 - 5;
+
 module battery()
 {
-    l = 108.5;
-    w=26;
     h=50;
     translate([0,0,h/2])
-    cube([l, w, h],center=true);
+    cube([battery_length, battery_width, h],center=true);
+}
+
+battery_stop_height = 5;
+battery_stop_thickness = 3;
+
+module battery_front_stop()
+{
+    // The rear end needs no stop: the trailer-hitch screw carries a 10 mm
+    // bearing that blocks it from sliding backward.
+    translate([width/2 - battery_width/2,
+               battery_center_y + battery_length/2,
+               thickness])
+    roundedcube([battery_width, battery_stop_thickness, battery_stop_height],
+                radius=1, center=false);
 }
 
 module battery_strap_holes()
@@ -700,10 +718,11 @@ difference()
     {
         base_with_screw_holes();
         base_wing_attach_pads();
+        battery_front_stop();
     }
     wing_attach_hole_pattern();
 
-    translate([width/2, length/2-5, 1])
+    translate([width/2, battery_center_y, 1])
     battery_strap_holes();
 
     translate([width/4-0.2,rear_axis_y,thickness])
