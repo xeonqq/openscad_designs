@@ -22,7 +22,7 @@ caster_center_hole_diameter = 8;
 caster_hole_spacing_x = 35;//27.5;
 caster_hole_spacing_y = 27.5;
 caster_edge_margin = 5;
-caster_screw_cap_diameter = 8.7; // washer-head screw cap
+caster_screw_cap_diameter = 8.8; // washer-head screw cap
 caster_screw_cap_depth = 1;      // cap recess from the top face
 // Shorten the plate by pulling the caster toward the rear axle.
 chassis_shorten = 5;          // mm removed from the overall plate length
