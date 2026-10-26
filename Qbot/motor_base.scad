@@ -64,6 +64,7 @@ stem_origin_x = (width - stem_width)/2;
 stem_gusset_length = 30;  // reach along the stem (Y)
 stem_gusset_width  = 20;  // reach along the rear bar (X)
 stem_gusset_raise  = 0;   // extra height above the base plate (0 = flush)
+stem_gusset_cut_scale = 0.4; // triangular window size, relative to the gusset
 
 caster_center_x = width/2;
 caster_center_y = rear_axis_y + caster_distance_to_rear_axis;
@@ -110,13 +111,25 @@ module stem_gussets(h=thickness)
         x0 = side == 0 ? stem_origin_x : stem_origin_x + stem_width;
         sx = side == 0 ? -1 : 1;
 
-        translate([0, 0, 0])
-        linear_extrude(height=gusset_h)
-        polygon([
+        gusset = [
             [x0 - sx*overlap, rear_bar_depth + stem_gusset_length],
             [x0 - sx*overlap, rear_bar_depth - overlap],
             [x0 + sx*stem_gusset_width, rear_bar_depth - overlap]
-        ]);
+        ];
+        // A centered, similar triangle keeps material along both legs and the
+        // concave corner, where the load path is.
+        center = (gusset[0] + gusset[1] + gusset[2]) / 3;
+        window = [for (p = gusset) center + stem_gusset_cut_scale * (p - center)];
+
+        difference()
+        {
+            linear_extrude(height=gusset_h)
+            polygon(gusset);
+
+            translate([0, 0, -1])
+            linear_extrude(height=gusset_h + 2)
+            polygon(window);
+        }
     }
 }
 
